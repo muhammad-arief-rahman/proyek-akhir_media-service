@@ -1,12 +1,22 @@
 import fs from "fs"
 import path from "path"
 
+type MediaFile = {
+  path: string
+  filename: string
+  extension: string
+  size: number
+  originalname: string
+  mimetype: string
+  fullPath: string
+}
+
 export function saveFile(
   file: Express.Multer.File,
   destination: string,
   filename?: string
 ) {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<MediaFile>((resolve, reject) => {
     try {
       // Check if the base storage directory exists (/storage), if not create it
       const storageDir = path.join(process.cwd(), "storage")
@@ -28,7 +38,6 @@ export function saveFile(
       const ext = path.extname(file.originalname) || ".bin" // Default to .bin if no extension
       const formattedFilename = filename ?? `${hash}${ext}` // Use the provided filename or generate a new one
 
-
       // Create the full file path and write the file stream to it
       const filePath = path.join(fullDestination, formattedFilename)
 
@@ -37,7 +46,15 @@ export function saveFile(
           reject(error)
         } else {
           // Resolves with the relative path to the file
-          resolve(path.join(destination, formattedFilename))
+          resolve({
+            path: path.join(destination, formattedFilename),
+            filename: formattedFilename,
+            extension: ext,
+            size: file.size,
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            fullPath: filePath,
+          })
         }
       })
     } catch (error) {
@@ -63,4 +80,4 @@ export function deleteFile(filePath: string) {
 export function fileExists(filePath: string) {
   const fullPath = path.join(process.cwd(), "storage", filePath)
   return fs.existsSync(fullPath)
-} 
+}
