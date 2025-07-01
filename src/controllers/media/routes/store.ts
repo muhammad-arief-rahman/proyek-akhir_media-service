@@ -13,8 +13,6 @@ const store: RequestHandler = async (req, res) => {
       parsedData.map(async (file) => {
         const mediaFile = await saveFile(file, "media-files")
 
-        console.log("Media File", mediaFile)
-
         const media = await prisma.media.create({
           data: {
             path: mediaFile.path,
@@ -35,6 +33,7 @@ const store: RequestHandler = async (req, res) => {
       response(res, 422, "Validation error", error.errors, {
         validationType: "ZodError",
       })
+      return
     }
 
     internalServerError(res, error)

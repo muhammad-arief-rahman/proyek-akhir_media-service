@@ -16,12 +16,16 @@ const serve: RequestHandler = async (req, res) => {
       return
     }
 
+    console.log("Serving media:", media)
+    
     res.setHeader("Content-Type", media.type)
     res.setHeader("Content-Disposition", `inline; filename="${media.name}"`)
     res.setHeader("Content-Length", media.size.toString())
 
     const absolutePath = path.resolve("storage/" + media.path)
     res.sendFile(absolutePath)
+
+    return
   } catch (error) {
     console.error("Error serving media:", error)
     
